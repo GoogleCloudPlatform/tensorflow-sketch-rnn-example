@@ -1,4 +1,4 @@
-# TensorFlow Sketch-RNN pretrained model demo
+# TensorFlow Sketch-RNN pre-trained model demo
 
 Discrlaimer: This is not an official Google product.
 
@@ -51,7 +51,7 @@ All remaining operations should be done from the root user.
 # pip install magenta 
 ```
 
-## Download the pretrained model binaries
+## Download the pre-trained model binaries
 
 ```
 # mkdir -p /opt/sketch_demo/models
@@ -116,7 +116,7 @@ Oct 21 05:59:17 sketch-demo start_app.sh[2049]: INFO:tensorflow:Recurrent dropou
 ```
 
 You have to wait around 60secs for the application to finish loading
- the pretrained model graph. After that, you can access the instance's
+ the pre-trained model graph. After that, you can access the instance's
  static IP address using a web browser. You draw a sample picture
  on the white canvas, and when you submit it, three children (emulated by
  a machine learning model) try to imitate your sample.

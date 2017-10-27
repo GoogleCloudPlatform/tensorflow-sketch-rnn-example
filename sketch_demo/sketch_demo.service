@@ -1,0 +1,10 @@
+[Unit]
+Description=Sketch-RNN demo
+After=syslog.target network.target auditd.service
+
+[Service]
+ExecStart=/opt/sketch_demo/start_app.sh
+ExecStop=/opt/sketc_demo/stop_app.sh
+
+[Install]
+WantedBy=multi-user.target

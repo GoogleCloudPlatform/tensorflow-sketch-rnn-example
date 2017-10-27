@@ -1,0 +1,141 @@
+<!doctype html>
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>Sketch Kids</title>
+    <link rel='shortcut icon' href='favicon.ico'/>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+  </head>
+  <body>
+
+  <h1>Sketch Kids (Sketch-RNN demo)</h1>
+  <table>
+    <td style="border-style: none;">
+      <div style="border: solid 2px #666; width: 254px; height: 254px;">
+        <canvas id="canvas" width="250" height="250"></canvas>
+      </div>
+    </td>
+    <td style="border-style: none;">
+      <button onclick="clear_value()">Clear</button>
+      <button id="submit" onclick="send_strokes()">Submit</button>
+  <p>
+  <table>
+    <tr>
+    <td><button onclick="set_room(1)">Classroom #1</button></td>
+    <td><button onclick="set_room(2)">Classroom #2</button></td>
+    </tr>
+    <tr>
+    <td><button onclick="set_room(3)">Classroom #3</button></td>
+    <td><button onclick="set_room(4)">Classroom #4</button></td>
+    </tr>
+  </table>
+    </td>
+  </table>
+
+  <p>
+  <div id="note">
+Note: The kids in this class love cats and buses! They would never draw other things.
+  </div>
+  <p>
+  <table border="1" width="600"><tr><td>Your Sample</td></tr>
+    <tr><td align="center"><img id="original" width="120" src="{{url_for('static', filename='cat.png')}}"></td></tr>
+    <tr><td>Kid1(Young)</td>
+    <td>Kid2(Younger)</td>
+    <td>Kid3(Youngest)</td></tr>
+    <tr>
+    <td align="center"><img id="kid1" width="120" src="{{url_for('static', filename='white.png')}}"></td>
+    <td align="center"><img id="kid2" width="120" src="{{url_for('static', filename='white.png')}}"></td>
+    <td align="center"><img id="kid3" width="120" src="{{url_for('static', filename='white.png')}}"></td>
+    </tr>
+  </table>
+  <p>
+
+  <script language="javascript" type="text/javascript">
+    var model = 'catbus';
+    var pen_down = 0;
+    var pre_x = 0, pre_y = 0;
+    var strokes = [];
+
+    var canvas = document.getElementById("canvas");
+    canvas.addEventListener("mousemove", function(e) {
+        if (e.buttons == 1) {
+          var ctx = canvas.getContext("2d");
+          if (pen_down == 0) {
+            strokes.push(e.offsetX, e.offsetY, 0);
+            pen_down = 1;
+          } else {
+            strokes.push(e.offsetX, e.offsetY, 1);
+            ctx.fillStyle = "rgb(0,0,0)";
+            var dx = e.offsetX - pre_x;
+            var dy = e.offsetY - pre_y;
+            var dist = parseInt(Math.sqrt(dx * dx + dy * dy));
+            for (i = 0.1; i < 1.1; i = i + 0.1) {
+              ctx.fillRect(pre_x + dx * i, pre_y + dy * i, 5, 5);
+            }
+          }
+          pre_x = e.offsetX;
+          pre_y = e.offsetY;
+          pen_down = 1;
+        } else {
+          pen_down = 0;
+        }
+    });
+
+    function clear_value() {
+      var ctx = canvas.getContext("2d");
+      ctx.fillStyle = "rgb(255,255,255)";
+      ctx.fillRect(0, 0, 400, 300);
+      ctx.beginPath();
+      strokes = [];
+    }
+
+    function set_room(id) {
+      var target = document.getElementById("submit");
+      if (id == 1) {
+        model = 'catbus';
+        var txt = "Note: The kids in this class love cats and buses! They would never draw other things."
+        document.getElementById("note").innerHTML = txt;
+      }
+      if (id == 2) {
+        model = 'elephantpig';
+        var txt = "Note: The kids in this class love elephants and pigs! They would never draw other things."
+        document.getElementById("note").innerHTML = txt;
+      }
+      if (id == 3) {
+        model = 'flamingo';
+        var txt = "Note: The kids in this class really love flamingos!"
+        document.getElementById("note").innerHTML = txt;
+      }
+      if (id == 4) {
+        model = 'owl';
+        var txt = "Note: The kids in this class really love owls!"
+        document.getElementById("note").innerHTML = txt;
+      }
+    }
+
+    function send_strokes() {
+        document.getElementById("submit").disabled = true;
+        var data = {strokes: strokes, model: model}
+        $.ajax({
+            type: 'POST',
+            url: 'post',
+            data: JSON.stringify(data),
+            success: function(response) {
+                var target0 = document.getElementById("original");
+                var target1 = document.getElementById("kid1");
+                var target2 = document.getElementById("kid2");
+                var target3 = document.getElementById("kid3");
+                target0.src = response.original;
+                target1.src = response.kid1;
+                target2.src = response.kid2;
+                target3.src = response.kid3;
+                document.getElementById("submit").disabled = false;},
+            error: function() {
+                document.getElementById("submit").disabled = false;},
+            contentType: "application/json",
+            dataType: 'json'
+        });
+    }
+  </script>
+  </body>
+</html>
